@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SUANG E-COFFEE - Premium Cafe</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #D4AF37;
+            --dark-gold: #996515;
+            --black: #0a0a0a;
+            --gray: #1a1a1a;
+            --white: #ffffff;
+            --shimmer: linear-gradient(90deg, rgba(212,175,55,0) 0%, rgba(255,255,255,0.6) 50%, rgba(212,175,55,0) 100%);
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+            font-family: 'Poppins', sans-serif;
+            color: var(--white);
+            display: flex;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        /* Container Utama (Mockup Smartphone) */
+        .app-container {
+            width: 100%;
+            max-width: 414px;
+            height: 100vh;
+            background-color: var(--black);
+            position: relative;
+            box-shadow: 0 0 50px rgba(212, 175, 55, 0.2);
+            overflow-y: auto;
+            border-left: 1px solid #222;
+            border-right: 1px solid #222;
+        }
+
+        .screen {
+            padding: 25px;
+            display: none;
+            flex-direction: column;
+            min-height: 100%;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .active-screen { display: flex; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- ANIMASI BERKILAU (GOLD SHIMMER) --- */
+        .shimmer-effect {
+            position: relative;
+            overflow: hidden;
+        }
+        .shimmer-effect::after {
+            content: '';
+            position: absolute;
+            top: 0; left: -150%;
+            width: 50%; height: 100%;
+            background: var(--shimmer);
+            transform: skewX(-20deg);
+            animation: shine 3s infinite;
+        }
+        @keyframes shine { 0% { left: -150%; } 100% { left: 150%; } }
+
+        /* --- SPLASH SCREEN & LOGIN --- */
+        #login-screen {
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: radial-gradient(circle at center, #1a1a1a 0%, #000 100%);
+        }
+
+        .logo-main {
+            width: 180px;
+            margin-bottom: 30px;
+            filter: drop-shadow(0 0 10px rgba(212,175,55,0.5));
+            animation: pulse 2s infinite ease-in-out;
+        }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+
+        h1 { font-family: 'Playfair Display', serif; color: var(--gold); margin-bottom: 5px; letter-spacing: 2px; }
+
+        input {
+            background: var(--gray);
+            border: 1px solid var(--dark-gold);
+            padding: 15px;
+            color: white;
+            width: 100%;
+            border-radius: 12px;
+            margin: 20px 0;
+            outline: none;
+            font-size: 16px;
+        }
+
+        .btn-gold {
+            background: linear-gradient(45deg, var(--dark-gold), var(--gold));
+            color: #000;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
+        }
+
+        /* --- MENU SCREEN --- */
+        .menu-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px; }
+        
+        .menu-grid { display: grid; gap: 20px; padding-bottom: 80px; }
+        
+        .card {
+            background: #111;
+            border-radius: 20px;
+            overflow: hidden;
+            border: 1px solid #222;
+            transition: 0.3s;
+        }
+        .card:hover { border-color: var(--gold); }
+
+        .card-img { width: 100%; height: 160px; object-fit: cover; }
+
+        .card-content { padding: 15px; }
+        .card-title { font-weight: 600; font-size: 1.1em; margin: 0; }
+        .card-price { color: var(--gold); font-weight: bold; margin: 5px 0; }
+
+        .stepper { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; background: #000; padding: 5px 15px; border-radius: 30px; border: 1px solid #333; }
+        .stepper button { background: none; border: none; color: var(--gold); font-size: 20px; cursor: pointer; padding: 5px 10px; }
+        .stepper span { font-weight: bold; font-size: 1.1em; }
+
+        /* --- FLOATING CART --- */
+        .cart-bar {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 370px;
+            background: var(--gold);
+            color: #000;
+            padding: 15px 25px;
+            border-radius: 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 100;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        /* --- CART SCREEN --- */
+        .cart-item { display: flex; justify-content: space-between; padding: 15px 0; border-bottom: 1px solid #222; }
+        .payment-toggle { display: flex; gap: 10px; margin: 20px 0; }
+        .pay-btn { flex: 1; padding: 12px; border: 1px solid var(--gold); background: none; color: white; border-radius: 10px; cursor: pointer; }
+        .pay-btn.selected { background: var(--gold); color: #000; font-weight: bold; }
+
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    
+    <div id="login-screen" class="screen active-screen">
+        <img src="https://raw.githubusercontent.com/username/repo/main/logo_saung.png" 
+             onerror="this.src='https://i.ibb.co/3YvXG8Q/logo-placeholder.png'" 
+             class="logo-main" alt="Logo Suang E-Coffee">
+        <h1>SAUNG E-COFFEE</h1>
+        <p style="color: #888; margin-bottom: 20px;">Experience the Gold Standard of Coffee</p>
+        <input type="text" id="username" placeholder="Masukkan Nama Anda">
+        <button class="btn-gold shimmer-effect" onclick="masukMenu()">Masuk</button>
+    </div>
+
+    <div id="menu-screen" class="screen">
+        <div class="menu-header">
+            <div>
+                <small style="color: var(--gold);">Selamat Datang,</small>
+                <div id="display-name" style="font-weight: 600; font-size: 1.2em;">Customer</div>
+            </div>
+            <img src="https://fortunate-teal-7kpbzk0d2d.edgeone.app/1000018953-removebg-preview.png" style="height: 80px;" alt="logo kecil">
+        </div>
+        
+        <h2 style="font-family: 'Playfair Display';">Premium Menu</h2>
+        
+        <div class="menu-grid" id="menu-container">
+            </div>
+
+        <div class="cart-bar shimmer-effect" id="cart-float" onclick="bukaKeranjang()" style="display: none;">
+            <span><span id="cart-count">0</span> Item Pesanan</span>
+            <span>Lihat Keranjang →</span>
+        </div>
+    </div>
+
+    <div id="cart-screen" class="screen">
+        <h2 style="font-family: 'Playfair Display'; color: var(--gold);">Keranjang Anda</h2>
+        <div id="cart-items-list" style="margin-top: 10px;"></div>
+        
+        <div style="margin-top: 30px;">
+            <p style="margin-bottom: 10px; font-weight: 600;">Metode Pembayaran:</p>
+            <div class="payment-toggle">
+                <button id="btn-cash" class="pay-btn selected" onclick="pilihPembayaran('Cash')">CASH</button>
+                <button id="btn-online" class="pay-btn" onclick="pilihPembayaran('Online')">ONLINE</button>
+            </div>
+        </div>
+
+        <div style="margin-top: auto; border-top: 2px solid var(--gold); padding-top: 20px;">
+            <div style="display: flex; justify-content: space-between; font-size: 1.2em; font-weight: bold; margin-bottom: 20px;">
+                <span>Total Bayar</span>
+                <span id="total-price" style="color: var(--gold);">Rp 0</span>
+            </div>
+            <button class="btn-gold shimmer-effect" onclick="kirimOrder()">Order Sekarang</button>
+            <button style="background:none; border:none; color:#888; width:100%; margin-top:15px; cursor:pointer;" onclick="kembaliMenu()">← Tambah Minuman Lagi</button>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // Database Menu
+    const menuData = [
+        { id: 'm1', nama: 'Wedang Uwuh', harga: 15000, img: 'https://cdn.rri.co.id/berita/Bukittinggi/o/1745406744499-WhatsApp-Image-2024-10-04-at-125718-1038239286/73qm61m0767wz3j.webp' }, // Base64 disingkat agar ringkas
+        { id: 'm2', nama: 'Kopi Hitam', harga: 12000, img: 'https://palpos.disway.id/upload/2836aee65c4ac6e42842ed2d33ecdf3e.jpg' },
+        { id: 'm3', nama: 'Es Teh', harga: 5000, img: 'https://cdn.rri.co.id/berita/Palangkaraya/o/1731306045976-es_teh48a08e583122/kpvmgtuk4u5g93n.jpeg' }
+    ];
+
+    let currentUser = "";
+    let cart = {};
+    let selectedPayment = "Cash";
+
+    // Alur 1: Masuk
+    function masukMenu() {
+        const nameInput = document.getElementById('username').value;
+        if(nameInput.trim() === "") { alert("Mohon masukkan nama!"); return; }
+        
+        currentUser = nameInput;
+        document.getElementById('display-name').innerText = currentUser;
+        
+        pindahScreen('menu-screen');
+        renderMenu();
+    }
+
+    // Render Daftar Menu
+    function renderMenu() {
+        const container = document.getElementById('menu-container');
+        container.innerHTML = menuData.map(item => `
+            <div class="card">
+                <img src="${item.img}" class="card-img" alt="${item.nama}" onerror="this.src='https://via.placeholder.com/150/111/D4AF37?text=${item.nama}'">
+                <div class="card-content">
+                    <p class="card-title">${item.nama}</p>
+                    <p class="card-price">Rp ${item.harga.toLocaleString('id-ID')}</p>
+                    <div class="stepper">
+                        <button onclick="updateQty('${item.id}', -1)">−</button>
+                        <span id="qty-${item.id}">${cart[item.id] || 0}</span>
+                        <button onclick="updateQty('${item.id}', 1)">+</button>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    // Update Jumlah Pesanan
+    function updateQty(id, change) {
+        if(!cart[id]) cart[id] = 0;
+        cart[id] += change;
+        if(cart[id] < 0) cart[id] = 0;
+        
+        document.getElementById(`qty-${id}`).innerText = cart[id];
+        
+        // Update Floating Cart
+        const totalItems = Object.values(cart).reduce((a, b) => a + b, 0);
+        const floatBar = document.getElementById('cart-float');
+        if(totalItems > 0) {
+            floatBar.style.display = 'flex';
+            document.getElementById('cart-count').innerText = totalItems;
+        } else {
+            floatBar.style.display = 'none';
+        }
+    }
+
+    // Alur 2: Keranjang
+    function bukaKeranjang() {
+        pindahScreen('cart-screen');
+        const listContainer = document.getElementById('cart-items-list');
+        let total = 0;
+        let html = "";
+
+        menuData.forEach(item => {
+            if(cart[item.id] > 0) {
+                const subtotal = item.harga * cart[item.id];
+                total += subtotal;
+                html += `
+                    <div class="cart-item">
+                        <div>
+                            <strong>${item.nama}</strong><br>
+                            <small>${cart[item.id]} x Rp ${item.harga.toLocaleString('id-ID')}</small>
+                        </div>
+                        <span style="color:var(--gold)">Rp ${subtotal.toLocaleString('id-ID')}</span>
+                    </div>
+                `;
+            }
+        });
+
+        listContainer.innerHTML = html;
+        document.getElementById('total-price').innerText = `Rp ${total.toLocaleString('id-ID')}`;
+    }
+
+    function pilihPembayaran(metode) {
+        selectedPayment = metode;
+        document.getElementById('btn-cash').classList.toggle('selected', metode === 'Cash');
+        document.getElementById('btn-online').classList.toggle('selected', metode === 'Online');
+    }
+
+    // Alur 3: Kirim ke WhatsApp
+    function kirimOrder() {
+        const nomorWA = "6285731718846";
+        let rincian = `Halo SUANG E-COFFEE, saya *${currentUser}* ingin memesan:%0A%0A`;
+        let total = 0;
+
+        menuData.forEach(item => {
+            if(cart[item.id] > 0) {
+                rincian += `- ${item.nama} (${cart[item.id]}x)%0A`;
+                total += item.harga * cart[item.id];
+            }
+        });
+
+        rincian += `%0A*Total Bayar:* Rp ${total.toLocaleString('id-ID')}`;
+        rincian += `%0A*Pembayaran:* ${selectedPayment}`;
+        
+        const url = `https://wa.me/${nomorWA}?text=${rincian}`;
+        window.open(url, '_blank');
+    }
+
+    // Helper Fungsi Navigasi
+    function pindahScreen(id) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active-screen'));
+        document.getElementById(id).classList.add('active-screen');
+    }
+
+    function kembaliMenu() { pindahScreen('menu-screen'); }
+</script>
+
+</body>
+</html>
