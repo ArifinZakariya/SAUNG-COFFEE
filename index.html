@@ -56,7 +56,6 @@
 
         /* LOGIN */
         #login-screen { justify-content: center; align-items: center; text-align: center; background: radial-gradient(circle at center, #1a1a1a 0%, #000 100%); }
-        /* Logo diperkecil dari 380px ke 280px agar muat di layar hp standar */
         .logo-main { width: 280px; margin-bottom: 20px; filter: drop-shadow(0 0 10px rgba(212,175,55,0.5)); animation: pulse 2s infinite ease-in-out; }
         @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
         h1 { font-family: 'Playfair Display', serif; color: var(--gold); margin-bottom: 5px; letter-spacing: 2px; }
@@ -101,19 +100,13 @@
         .pay-btn { flex: 1; padding: 12px; border: 1px solid var(--gold); background: none; color: white; border-radius: 10px; cursor: pointer; }
         .pay-btn.selected { background: var(--gold); color: #000; font-weight: bold; }
 
-        /* ONLINE PAYMENT AREA */
+        /* QRIS AREA */
         #online-payment-area {
             background: #111; border-radius: 15px; padding: 15px;
             margin-top: 10px; border: 1px dashed var(--gold); display: none;
+            text-align: center;
         }
         .qris-preview { width: 100%; max-width: 200px; border-radius: 10px; margin: 10px auto; display: block; border: 3px solid white; }
-        .upload-box { margin-top: 15px; text-align: center; }
-        .custom-file-upload {
-            display: inline-block; padding: 8px 12px; cursor: pointer;
-            background: #222; border-radius: 8px; border: 1px solid var(--gold);
-            font-size: 14px; color: var(--gold);
-        }
-        #file-chosen { font-size: 12px; color: #888; margin-top: 5px; display: block; }
     </style>
 </head>
 <body>
@@ -157,15 +150,9 @@
         </div>
 
         <div id="online-payment-area">
-            <p style="text-align:center; font-size: 13px; margin: 0;">Silakan Scan QRIS:</p>
+            <p style="font-size: 13px; margin: 0;">Silakan Scan QRIS Berikut:</p>
             <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://drive.google.com/file/d/1BkDpDvSmm23B7SK-XwqX1jFHAZjILCIP/view?usp=sharing" class="qris-preview" alt="QRIS">
-            
-            <div class="upload-box">
-                <label for="file-upload" class="custom-file-upload">📸 Pilih Bukti Pembayaran</label>
-                <input id="file-upload" type="file" accept="image/*" hidden onchange="handleFile(this)">
-                <span id="file-chosen">Belum ada file dipilih</span>
-                <img id="img-preview" style="display:none; width:100%; margin-top:10px; border-radius:10px;">
-            </div>
+            <p style="font-size: 11px; color: #aaa; margin-top: 5px;">Silakan selesaikan pembayaran sebelum klik order.</p>
         </div>
 
         <div style="margin-top: auto; border-top: 2px solid var(--gold); padding-top: 20px;">
@@ -189,7 +176,6 @@
     let currentUser = "";
     let cart = {};
     let selectedPayment = "Cash";
-    let hasFile = false;
 
     function masukMenu() {
         const nameInput = document.getElementById('username').value;
@@ -256,42 +242,27 @@
         document.getElementById('online-payment-area').style.display = metode === 'Online' ? 'block' : 'none';
     }
 
-    function handleFile(input) {
-        if (input.files && input.files[0]) {
-            document.getElementById('file-chosen').textContent = input.files[0].name;
-            hasFile = true;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const preview = document.getElementById('img-preview');
-                preview.src = e.target.result;
-                preview.style.display = 'block';
-            }
-            reader.readAsDataURL(input.files[0]);
-        }
-    }
-
     function kirimOrder() {
-        if (selectedPayment === 'Online' && !hasFile) {
-            alert("Harap pilih/upload bukti pembayaran terlebih dahulu!");
-            return;
-        }
-
         const nomorWA = "6285731718846";
         let rincian = `Halo SAUNG E-COFFEE, saya *${currentUser}* ingin memesan:%0A%0A`;
         let total = 0;
+        let hasItem = false;
 
         menuData.forEach(item => {
             if(cart[item.id] > 0) {
                 rincian += `- ${item.nama} (${cart[item.id]}x)%0A`;
                 total += item.harga * cart[item.id];
+                hasItem = true;
             }
         });
 
+        if(!hasItem) { alert("Keranjang Anda kosong!"); return; }
+
         rincian += `%0A*Total Bayar:* Rp ${total.toLocaleString('id-ID')}`;
-        rincian += `%0A*Pembayaran:* ${selectedPayment}`;
+        rincian += `%0A*Metode Pembayaran:* ${selectedPayment}`;
         
         if (selectedPayment === 'Online') {
-            rincian += `%0A%0A*Catatan:* Saya akan melampirkan foto bukti pembayaran setelah pesan ini terkirim.`;
+            rincian += `%0A%0A*Jangan lupa upload bukti pembayaran disini*`;
         }
         
         const url = `https://wa.me/${nomorWA}?text=${rincian}`;
